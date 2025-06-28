@@ -43,11 +43,7 @@ export default function SignUpPage() {
   try {
       // 1. Upload image
       const imageFormData = new FormData();
-      console.log("check data --> ", data)
-      console.log(process.env.NEXT_PUBLIC_QUIC_GEAR2_API)
-      console.log("cehck imgFormData1 --> ", imageFormData)
       imageFormData.append("image", data.imgPath[0]);
-      console.log("cehck imgFormData2 --> ", imageFormData)
       const uploadRes = await axios.post(
         `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/single`,
         imageFormData,

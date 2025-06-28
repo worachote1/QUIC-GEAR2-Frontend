@@ -45,17 +45,20 @@ export default function CreateProductPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const formData = new FormData();
-      formData.append("image", data.imgPath[0]);
+      const imageFormData = new FormData();
+      Array.from(data.imgPath).forEach(file => {
+        imageFormData.append("images", file);
+      });
+
       const uploadRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/single`,
-        formData,
+        `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/multiple`,
+        imageFormData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
 
-      const imageUrl = uploadRes.data.image_url;
+      const image_urls = uploadRes.data.image_urls;
 
       const productPayload = {
         name: data.name,
@@ -65,7 +68,7 @@ export default function CreateProductPage() {
         brand: data.brand,
         isWireless: data.isWireless === "true",
         isRGB: data.isRGB === "true",
-        imgPath: [imageUrl],
+        imgPath: image_urls,
         stock: +data.stock,
         description: data.description || "",
       };
@@ -166,9 +169,11 @@ export default function CreateProductPage() {
           <input
             type="file"
             accept="image/*"
-            {...register("imgPath", { required: "Image is required" })}
+            multiple
+            {...register("imgPath", { required: "At least one image is required" })}
             className="w-full text-slate-500 font-medium text-sm bg-white border file:cursor-pointer cursor-pointer file:border-0 file:py-3 file:px-4 file:mr-4 file:bg-gray-100 file:hover:bg-gray-200 file:text-slate-500 rounded"
           />
+          <p className="text-xs text-slate-500 mt-2">PNG, JPG, JPEG and WEBP are allowed.</p>
           {errors.imgPath && <p className="text-red-500 text-sm mt-1">{errors.imgPath.message}</p>}
         </div>
 
