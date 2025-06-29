@@ -1,0 +1,1 @@
+export const profile_default_imgPath = 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg'
