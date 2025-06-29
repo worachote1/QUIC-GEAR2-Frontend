@@ -5,29 +5,8 @@ import { useForm } from "react-hook-form";
 import { useRouter, useParams } from "next/navigation";
 import Swal from "sweetalert2";
 import axios from "axios";
-
-const brandList = ["Razer", "Nubwo", "Logitech", "Signo", "SteelSeries", "HyperX", "Corsair", "Neolution E-sport", "Keychron", "Zowie"];
-const typeList = ["Headphone", "Mouse", "Keyboard", "Streaming", "Table&Chair"];
-const subTypeMap: Record<string, string[]> = {
-  Headphone: ["TrueWireless", "Wireless", "Fullsize", "InEar", "Earbud", "SoundCard", "Accessory"],
-  Mouse: ["Mouse", "Mousepad", "Accessory"],
-  Keyboard: ["RubberDome", "Mechanical", "WristRest"],
-  Streaming: ["Webcam", "Microphone", "Accessory"],
-  "Table&Chair": ["Table", "Chair"]
-};
-
-interface FormData {
-  name: string;
-  price: number;
-  type: string;
-  subType: string;
-  brand: string;
-  isWireless: string;
-  isRGB: string;
-  imgPath: FileList;
-  stock: number;
-  description: string;
-}
+import { IProductFormData } from "@/types/product";
+import { brandList, subTypeMap, typeList } from "@/constants/productOptions";
 
 export default function EditProductPage() {
   const {
@@ -36,7 +15,7 @@ export default function EditProductPage() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<IProductFormData>();
   const router = useRouter();
   const params = useParams();
   const productId = params?.id as string;
@@ -80,7 +59,7 @@ export default function EditProductPage() {
     setExistingImages((prev) => prev.filter((img) => img !== url));
   };
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: IProductFormData) => {
     try {
       const formData = new FormData();
       Array.from(data.imgPath || []).forEach((file) => {

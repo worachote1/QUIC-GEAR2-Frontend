@@ -5,31 +5,8 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import axios from "axios";
-
-const brandList = ["Razer", "Nubwo", "Logitech", "Signo", "SteelSeries", "HyperX", "Corsair", "Neolution E-sport", "Keychron", "Zowie"];
-const typeList = ["Headphone", "Mouse", "Keyboard", "Streaming", "Table&Chair"];
-const subTypeMap: Record<string, string[]> = {
-  "Headphone": ["TrueWireless", "Wireless", "Fullsize", "InEar", "Earbud", "SoundCard", "Accessory"],
-  "Mouse": ["Mouse", "Mousepad", "Accessory"],
-  "Keyboard": ["RubberDome", "Mechanical", "WristRest"],
-  "Streaming": ["Webcam", "Microphone", "Accessory"],
-  "Table&Chair": ["Table", "Chair"]
-};
-
-interface FormData {
-  name: string;
-  price: number;
-  type: string;
-  subType: string;
-  brand: string;
-  isWireless: string;
-  isRGB: string;
-  imgPath: FileList;
-  stock: number;
-  rating: number;
-  totalOrder: number;
-  description: string;
-}
+import { IProductFormData } from "@/types/product";
+import { brandList, subTypeMap, typeList } from "@/constants/productOptions";
 
 export default function CreateProductPage() {
   const {
@@ -38,12 +15,12 @@ export default function CreateProductPage() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<IProductFormData>();
 
   const router = useRouter();
   const selectedType = watch("type");
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: IProductFormData) => {
     try {
       const imageFormData = new FormData();
       Array.from(data.imgPath).forEach(file => {
@@ -103,7 +80,7 @@ export default function CreateProductPage() {
 
         <div>
           <label className="block mb-1 font-medium">Price</label>
-          <input {...register("price", { required: "Price is required", valueAsNumber: true })} type="number" className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-blue-500" placeholder="Enter price" />
+          <input {...register("price", { required: "Price is required", valueAsNumber: true, min: { value: 0, message: "Price must be non-negative" } })} type="number" className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-blue-500" placeholder="Enter price" />
           {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
         </div>
 
@@ -160,7 +137,7 @@ export default function CreateProductPage() {
 
         <div>
           <label className="block mb-1 font-medium">Stock</label>
-          <input {...register("stock", { required: "Stock is required", valueAsNumber: true })} type="number" className="w-full border border-gray-300 px-4 py-2 rounded-md" placeholder="Enter stock amount" />
+          <input {...register("stock", { required: "Stock is required", valueAsNumber: true, min: { value: 0, message: "Stock must be non-negative" } })} type="number" className="w-full border border-gray-300 px-4 py-2 rounded-md" placeholder="Enter stock amount" />
           {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock.message}</p>}
         </div>
 
