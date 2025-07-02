@@ -1,12 +1,11 @@
+// hooks/useAdmindProducts.ts
 // For fetching and listing products
 
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import Swal from 'sweetalert2'
-import { IProduct } from '@/types/product'
 
-export function useAdminProducts() {
-  const [products, setProducts] = useState<IProduct[]>([])
+export function useAdminUsers() {
+  const [users, setUsers] = useState<IUser[]>([])
   const [loading, setLoading] = useState(true)
 
   // Fetch all products on mount

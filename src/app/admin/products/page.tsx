@@ -7,144 +7,24 @@ import { brandList, subTypeMap, typeList } from '@/constants/productOptions'
 import { IProductFormData } from '@/types/product'
 import { useForm } from 'react-hook-form'
 import { IProduct  } from '@/types/product'
+import { useAdminProductActions } from '@/hooks/admin/useAdminProductActions'
+import { useAdminProducts } from '@/hooks/admin/useAdminProducts'
+import { useAdminProductEditor } from '@/hooks/admin/useAdminProductEditor'
 
 export default function AdminProductPage() {
-  const [products, setProducts] = useState<IProduct[]>([])
-  
-  const [loading, setLoading] = useState<boolean>(true)
-  const [editing, setEditing] = useState<IProduct | null>(null)
 
-  // useForm hook from react-hook-form to manage form state, validation, and interaction
+  const { products, loading, setProducts } = useAdminProducts()
   const {
-    register,           // Connects input fields to form state and handles validation rules
-    handleSubmit,       // Wraps your submit handler and automatically runs validation
-    watch,              // Subscribes to form field changes in real-time (e.g., for conditional UI)
-    reset,              // Programmatically sets or resets form values (e.g., when editing an existing record)
-    formState: { errors }  // Contains current validation error messages for each field
-  } = useForm<IProductFormData>();
-
-  // Watch the 'type' field value in real-time (e.g., to dynamically update subType options)
-  const selectedType = watch('type');
-  useEffect(() => {
-    const fetchProducts = async () => {
-        try {
-            // get all product
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product`)
-            setProducts(res.data.data.items)
-        } catch (error) {
-            console.error('Error fetching products:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-        fetchProducts()
-    }, [])
-
-
-  const handleDelete = async (prod: IProduct) => {
-    const { isConfirmed } = await Swal.fire({
-      title: 'Confirm delete',
-      text: 'Cannot undo!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete',
-    })
-    if (!isConfirmed) return
-
-    try {
-      // === Delete Images if present ===
-      if(prod.imgPath?.length) {
-        await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/delete`, {
-          paths: prod.imgPath ?? [],
-        });
-      }
-
-      // === Delete product ===
-      await axios.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${prod.id}`)
-      setProducts(p => p.filter(x => x.id !== prod.id))
-      Swal.fire('Deleted!', '', 'success')
-    } catch {
-      Swal.fire('Error!', 'Failed to delete', 'error')
-    }
-  }
-
-  const openEdit = (prod: IProduct) => {
-    setEditing(prod)
-    reset({
-      name: prod.name,
-      price: prod.price,
-      type: prod.type,
-      subType: prod.subType,
-      brand: prod.brand,
-      isWireless: prod.isWireless.toString(),
-      isRGB: prod.isRGB.toString(),
-      stock: prod.stock,
-      description: prod.description,
-    })
-  }
-
-  const onSubmit = async (data: IProductFormData) => {
-    if (!editing) return;
-
-    // Construct base payload
-    const payload: any = {
-      name: data.name,
-      price: +data.price,
-      type: data.type,
-      subType: data.subType,
-      brand: data.brand,
-      isWireless: data.isWireless === 'true',
-      isRGB: data.isRGB === 'true',
-      stock: +data.stock,
-      description: data.description || '',
-    };
-
-    try {
-      const files = data.imgPath; // FileList from react-hook-form
-      const hasNewImages = files && files.length > 0;
-
-      // === Upload Images if present ===
-      if (hasNewImages) {
-        const formData = new FormData();
-        Array.from(files).forEach(file => {
-          formData.append('images', file);
-        });
-
-        const uploadRes = await axios.post(
-          `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/multiple`,
-          formData,
-          {
-            headers: { 'Content-Type': 'multipart/form-data' },
-          }
-        );
-
-        const newImagePaths = uploadRes.data.image_urls || [];
-
-        // === Delete old images ===
-        await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/delete`, {
-          paths: editing.imgPath ?? [],
-        });
-
-        // Attach new imgPath to payload
-        payload.imgPath = newImagePaths;
-      }
-
-      // === Update Product ===
-      await axios.patch(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${editing.id}`, payload);
-
-      Swal.fire('Updated!', '', 'success');
-
-      // === Update local state ===
-      setProducts(prev =>
-        prev.map(p => (p.id === editing.id ? { ...p, ...payload } : p))
-      );
-
-      setEditing(null);
-    } catch (err) {
-      console.error(err);
-      Swal.fire('Error!', 'Failed to update', 'error');
-    }
-  };
+  editing,
+  setEditing,
+  register,
+  handleSubmit,
+  selectedType,
+  errors,
+  openEdit,
+  closeModal,
+} = useAdminProductEditor();
+  const { handleDeleteProduct, handleUpdateProduct } = useAdminProductActions(setProducts, closeModal)
 
   return (
     <div className="p-6">
@@ -174,7 +54,7 @@ export default function AdminProductPage() {
                 <td className="px-4 py-2">{p.isRGB ? 'Yes' : 'No'}</td>
                 <td className="px-4 py-2 space-x-2">
                   <button onClick={() => openEdit(p)} className="px-2 py-1 bg-blue-600 text-white rounded">Edit</button>
-                  <button onClick={() => handleDelete(p)} className="px-2 py-1 bg-red-600 text-white rounded">Delete</button>
+                  <button onClick={() => handleDeleteProduct(p)} className="px-2 py-1 bg-red-600 text-white rounded">Delete</button>
                 </td>
               </tr>
             ))}
@@ -186,7 +66,7 @@ export default function AdminProductPage() {
         <div className="fixed inset-0 bg-black/25 backdrop-blur-sm flex justify-center items-center">
           <div className="bg-white p-6 rounded w-full max-w-lg">
             <h2 className="text-lg font-semibold mb-4">Edit Product</h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit((data) => handleUpdateProduct(data, editing))} className="space-y-4">
               {/* name */}
               <div>
                 <label>Name</label>

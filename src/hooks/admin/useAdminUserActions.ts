@@ -1,4 +1,4 @@
-// for actions like update, delete
+// hooks/useProductActions.ts
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { IProduct } from '@/types/product'
@@ -32,10 +32,7 @@ export function useAdminProductActions(setProducts: React.Dispatch<React.SetStat
     }
   }
 
-  const handleUpdateProduct = async (data: IProductFormData, editing: IProduct) => {
-    if (!editing) return;
-
-    // Construct base payload
+  const handleUpdateProduct = async (editing: IProduct, data: IProductFormData) => {
     const payload: any = {
       name: data.name,
       price: +data.price,
