@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { profile_default_imgPath } from '@/constants/profileImgPath'
+import { truncateWords } from '@/utils/truncateWords';
+import { getPublicImageUrl } from '@/utils/getPublicImageUrl';
 
 interface User {
   id: string
@@ -24,13 +26,6 @@ export default function AdminUserPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
 
-  const truncateWords =(text: string | null, maxWords: number): string => {
-        if (!text) return '';
-        const words = text.trim().split(/\s+/);
-        if (words.length <= maxWords) return text;
-        return words.slice(0, maxWords).join(' ') + '...';
-    }
-
   useEffect(() => {
     const fetchUsers = async () => {
         try {
@@ -44,13 +39,6 @@ export default function AdminUserPage() {
     }
         fetchUsers()
     }, [])
-
-
-    const getPublicImageUrl = (imgPath: string | undefined) => {
-        const publicMinioHost = process.env.NEXT_PUBLIC_MINIO_HOST || 'http://localhost:9001'
-        if (!imgPath) return '/default-user.png'
-        return imgPath.replace('minio:9001', publicMinioHost)
-    }
 
     const handleDelete = async (id: string) => {
     const result = await Swal.fire({

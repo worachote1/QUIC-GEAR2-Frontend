@@ -6,32 +6,25 @@ import Swal from 'sweetalert2'
 import { brandList, subTypeMap, typeList } from '@/constants/productOptions'
 import { IProductFormData } from '@/types/product'
 import { useForm } from 'react-hook-form'
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  type: string
-  subType: string
-  brand: string
-  isWireless: boolean
-  isRGB: boolean
-  imgPath?: string[]
-  stock: number
-  rating?: number
-  description?: string
-  totalOrder?: number
-}
+import { IProduct  } from '@/types/product'
 
 export default function AdminProductPage() {
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<IProduct[]>([])
   
-  const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState<Product | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [editing, setEditing] = useState<IProduct | null>(null)
 
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<IProductFormData>()
-  const selectedType = watch('type')
+  // useForm hook from react-hook-form to manage form state, validation, and interaction
+  const {
+    register,           // Connects input fields to form state and handles validation rules
+    handleSubmit,       // Wraps your submit handler and automatically runs validation
+    watch,              // Subscribes to form field changes in real-time (e.g., for conditional UI)
+    reset,              // Programmatically sets or resets form values (e.g., when editing an existing record)
+    formState: { errors }  // Contains current validation error messages for each field
+  } = useForm<IProductFormData>();
 
+  // Watch the 'type' field value in real-time (e.g., to dynamically update subType options)
+  const selectedType = watch('type');
   useEffect(() => {
     const fetchProducts = async () => {
         try {
@@ -48,7 +41,7 @@ export default function AdminProductPage() {
     }, [])
 
 
-  const handleDelete = async (prod: Product) => {
+  const handleDelete = async (prod: IProduct) => {
     const { isConfirmed } = await Swal.fire({
       title: 'Confirm delete',
       text: 'Cannot undo!',
@@ -75,7 +68,7 @@ export default function AdminProductPage() {
     }
   }
 
-  const openEdit = (prod: Product) => {
+  const openEdit = (prod: IProduct) => {
     setEditing(prod)
     reset({
       name: prod.name,
@@ -132,7 +125,7 @@ export default function AdminProductPage() {
           paths: editing.imgPath ?? [],
         });
 
-        // 👇 Attach new imgPath to payload
+        // Attach new imgPath to payload
         payload.imgPath = newImagePaths;
       }
 
@@ -188,11 +181,9 @@ export default function AdminProductPage() {
           </tbody>
         </table>
       )}
-
+  
       {editing && (
-        // catalog: fixed inset-0 z-20 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-sm"
-        // fixed inset-0 bg-black bg-opacity-25 flex justify-center items-center
-        <div className="fixed inset-0 bg-black bg-opacity-25 flex justify-center items-center">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm flex justify-center items-center">
           <div className="bg-white p-6 rounded w-full max-w-lg">
             <h2 className="text-lg font-semibold mb-4">Edit Product</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
