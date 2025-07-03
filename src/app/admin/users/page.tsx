@@ -6,74 +6,12 @@ import Swal from 'sweetalert2'
 import { profile_default_imgPath } from '@/constants/profileImgPath'
 import { truncateWords } from '@/utils/truncateWords';
 import { getPublicImageUrl } from '@/utils/getPublicImageUrl';
-
-interface User {
-  id: string
-  username: string
-  email: string
-  imgPath: string
-  coins: number
-  createdAt: string
-  role: string
-  address: string
-  phone: string
-  bank: string
-  account_number: string
-  account_name: string
-}
+import { useAdminUsers } from '@/hooks/admin/useAdminUsers'
+import { useAdminUserActions } from '@/hooks/admin/useAdminUserActions'
 
 export default function AdminUserPage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-        try {
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user`)
-            setUsers(res.data.data)
-        } catch (error) {
-            console.error('Error fetching users:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-        fetchUsers()
-    }, [])
-
-    const handleDelete = async (id: string) => {
-    const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'This action cannot be undone!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!',
-    })
-
-    if (!result.isConfirmed) return
-
-    try {
-        await axios.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user/${id}`)
-        setUsers(prev => prev.filter(user => user.id !== id))
-
-        await Swal.fire({
-        title: 'Deleted!',
-        text: 'The user has been deleted.',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
-        })
-    } catch (error) {
-        console.error('Failed to delete user:', error)
-
-        await Swal.fire({
-        title: 'Error!',
-        text: 'Something went wrong while deleting the user.',
-        icon: 'error',
-        })
-    }
-    }
+  const { users, setUsers, loading } = useAdminUsers()
+  const { handleUserDelete } = useAdminUserActions(setUsers)
 
   return (
     <div className="p-6">
@@ -131,7 +69,7 @@ export default function AdminUserPage() {
                   <td className="px-6 py-4">{user.account_name || '-'}</td>
                   <td className="px-6 py-4">
                     <button
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => handleUserDelete(user.id)}
                         className="px-5 py-2.5 rounded-lg text-sm cursor-pointer tracking-wider font-medium border-2 border-current outline-none bg-red-700 hover:bg-transparent text-white hover:text-red-700 transition-all duration-300">
                         Delete
                     </button>

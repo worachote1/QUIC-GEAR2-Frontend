@@ -1,29 +1,30 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-import Swal from 'sweetalert2'
 import { brandList, subTypeMap, typeList } from '@/constants/productOptions'
-import { IProductFormData } from '@/types/product'
-import { useForm } from 'react-hook-form'
-import { IProduct  } from '@/types/product'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useAdminProductActions } from '@/hooks/admin/useAdminProductActions'
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts'
 import { useAdminProductEditor } from '@/hooks/admin/useAdminProductEditor'
+import { useState } from 'react';
+import { PaginationAdmin } from '@/components/paginations/PaginationAdmin';
 
 export default function AdminProductPage() {
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
-  const { products, loading, setProducts } = useAdminProducts()
+  const { products, loading, setProducts, totalPages } = useAdminProducts(page, limit)
+
   const {
-  editing,
-  setEditing,
-  register,
-  handleSubmit,
-  selectedType,
-  errors,
-  openEdit,
-  closeModal,
-} = useAdminProductEditor();
+    editing,
+    setEditing,
+    register,
+    handleSubmit,
+    selectedType,
+    errors,
+    openEdit,
+    closeModal,
+  } = useAdminProductEditor();
+
   const { handleDeleteProduct, handleUpdateProduct } = useAdminProductActions(setProducts, closeModal)
 
   return (
@@ -62,6 +63,10 @@ export default function AdminProductPage() {
         </table>
       )}
   
+      {/* Pagination controls */}
+      <PaginationAdmin page={page} setPage={setPage} totalPages={totalPages} />
+
+      {/* Modal */}
       {editing && (
         <div className="fixed inset-0 bg-black/25 backdrop-blur-sm flex justify-center items-center">
           <div className="bg-white p-6 rounded w-full max-w-lg">

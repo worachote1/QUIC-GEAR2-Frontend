@@ -5,16 +5,18 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import { IProduct } from '@/types/product'
 
-export function useAdminProducts() {
+export function useAdminProducts(page: number, limit: number) {
   const [products, setProducts] = useState<IProduct[]>([])
   const [loading, setLoading] = useState(true)
+  const [totalPages, setTotalPages] = useState(1);
 
   // Fetch all products on mount
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product`)
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product?page=${page}&limit=${limit}`)
         setProducts(res.data.data.items)
+        setTotalPages(res.data.meta.totalPages);
       } catch (err) {
         console.error('Error fetching products:', err)
       } finally {
@@ -22,11 +24,12 @@ export function useAdminProducts() {
       }
     }
     fetchProducts()
-  }, [])
+  }, [page, limit])
 
   return {
     products,
-    loading,
     setProducts,
+    loading,
+    totalPages
   }
 }
