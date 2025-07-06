@@ -18,7 +18,10 @@ export function useAdminUserActions(setUsers: React.Dispatch<React.SetStateActio
     if (!result.isConfirmed) return
 
     try {
-        await axios.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user/${id}`)
+        await axios.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user/${id}`,
+        {
+          withCredentials: true
+        })
         setUsers(prev => prev.filter(user => user.id !== id))
 
         await Swal.fire({

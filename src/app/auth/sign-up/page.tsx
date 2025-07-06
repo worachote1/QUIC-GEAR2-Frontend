@@ -30,7 +30,6 @@ export default function SignUpPage() {
   const router = useRouter();
 
   const onSubmit = async (data: FormData) => {
-    console.log("check data: ", data)
     if (data.password !== data.confirmPassword) {
       Swal.fire({
         icon: "error",
