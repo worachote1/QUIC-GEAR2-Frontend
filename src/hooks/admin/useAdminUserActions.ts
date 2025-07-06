@@ -1,7 +1,7 @@
 // hooks/useProductActions.ts
-import axios from 'axios'
 import Swal from 'sweetalert2'
 import { IUser } from '@/types/user'
+import api from '@/lib/axios'
 
 export function useAdminUserActions(setUsers: React.Dispatch<React.SetStateAction<IUser[]>>) {
   const handleUserDelete = async (id: string) => {
@@ -18,7 +18,7 @@ export function useAdminUserActions(setUsers: React.Dispatch<React.SetStateActio
     if (!result.isConfirmed) return
 
     try {
-        await axios.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user/${id}`,
+        await api.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user/${id}`,
         {
           withCredentials: true
         })

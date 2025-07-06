@@ -1,4 +1,3 @@
-// hooks/useAdminProductEditor.ts
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { IProduct, IProductFormData } from "@/types/product";

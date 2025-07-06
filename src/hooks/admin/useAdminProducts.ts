@@ -1,9 +1,8 @@
 // For fetching and listing products
 
 import { useState, useEffect } from 'react'
-import axios from 'axios'
-import Swal from 'sweetalert2'
 import { IProduct } from '@/types/product'
+import api from '@/lib/axios'
 
 export function useAdminProducts(page: number, limit: number) {
   const [products, setProducts] = useState<IProduct[]>([])
@@ -14,7 +13,7 @@ export function useAdminProducts(page: number, limit: number) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product?page=${page}&limit=${limit}`,
+        const res = await api.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product?page=${page}&limit=${limit}`,
         {
           withCredentials: true
         })

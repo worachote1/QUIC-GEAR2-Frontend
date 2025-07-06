@@ -1,9 +1,8 @@
-// hooks/useAdmindProducts.ts
 // For fetching and listing products
 
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { IUser } from '@/types/user'
+import api from '@/lib/axios'
 
 export function useAdminUsers() {
   const [users, setUsers] = useState<IUser[]>([])
@@ -13,7 +12,7 @@ export function useAdminUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user`)
+        const res = await api.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user`)
         setUsers(res.data.data)
       } catch (err) {
         console.error('Error fetching products:', err)

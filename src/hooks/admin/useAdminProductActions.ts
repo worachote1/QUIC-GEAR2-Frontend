@@ -1,8 +1,8 @@
 // for actions like update, delete
-import axios from 'axios'
 import Swal from 'sweetalert2'
 import { IProduct } from '@/types/product'
 import { IProductFormData } from '@/types/product'
+import api from '@/lib/axios'
 
 export function useAdminProductActions(setProducts: React.Dispatch<React.SetStateAction<IProduct[]>>, closeModal: () => void) {
   const handleDeleteProduct = async (prod: IProduct) => {
@@ -18,7 +18,7 @@ export function useAdminProductActions(setProducts: React.Dispatch<React.SetStat
     try {
       // Delete images if exist
       if (prod.imgPath?.length) {
-        await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/delete`, {
+        await api.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/delete`, {
           paths: prod.imgPath,
         }, 
         {
@@ -27,7 +27,7 @@ export function useAdminProductActions(setProducts: React.Dispatch<React.SetStat
       }
 
       // Delete product
-      await axios.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${prod.id}`, 
+      await api.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${prod.id}`, 
       {
         withCredentials: true
       })
@@ -63,7 +63,7 @@ export function useAdminProductActions(setProducts: React.Dispatch<React.SetStat
         const formData = new FormData()
         Array.from(files).forEach(file => formData.append('images', file))
 
-        const uploadRes = await axios.post(
+        const uploadRes = await api.post(
           `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/multiple`,
           formData,
           {
@@ -75,7 +75,7 @@ export function useAdminProductActions(setProducts: React.Dispatch<React.SetStat
         const newImagePaths = uploadRes.data.image_urls || []
 
         // Delete old images
-        await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/delete`, {
+        await api.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/delete`, {
           paths: editing.imgPath ?? [],
         }, 
         {
@@ -86,7 +86,7 @@ export function useAdminProductActions(setProducts: React.Dispatch<React.SetStat
       }
 
       // Update the product
-      await axios.patch(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${editing.id}`, payload,
+      await api.patch(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${editing.id}`, payload,
       {
         withCredentials: true
       })
