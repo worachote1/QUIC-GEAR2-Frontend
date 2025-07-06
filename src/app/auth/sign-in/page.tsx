@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { setAccessToken } from "@/lib/authToken";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -16,11 +17,19 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/login`, {
-        email,
-        password,
-      });
 
+      // Call your login API and get tokens
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/login`, 
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true
+        }
+      );
+
+      // Alert login success
       Swal.fire({
         icon: "success",
         title: "Login Successful",
@@ -28,7 +37,14 @@ export default function SignInPage() {
         showConfirmButton: false,
       });
 
-      router.push("/");
+      // Set access token
+      setAccessToken(response.data.accessToken);
+
+      // Then redirect back to previous page
+      const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+      localStorage.removeItem('redirectAfterLogin');
+      router.push(redirectPath);
+
     } catch (err: any) {
       const message = err.response?.data?.message || "Login failed";
       Swal.fire({
