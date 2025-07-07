@@ -1,6 +1,5 @@
 
 import axios from 'axios';
-import { getAccessToken, setAccessToken } from './authToken';
 
 
 /**
@@ -41,6 +40,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
+        console.log("try to get refresh token: ")
         const res = await axios.post(
           `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/refresh-token`,
           {},

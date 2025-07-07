@@ -6,9 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { setAccessToken } from "@/lib/authToken";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SignInPage() {
+  const { setAccessToken } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -37,7 +38,7 @@ export default function SignInPage() {
         showConfirmButton: false,
       });
 
-      // Set access token
+      // Set access token (update context)
       setAccessToken(response.data.accessToken);
 
       // Then redirect back to previous page
