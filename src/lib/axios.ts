@@ -17,60 +17,65 @@ const api = axios.create({
   withCredentials: true, // send cookie refreshToken
 });
 
-// Request Interceptor → Add Access Token (Before Sending a Request)
-api.interceptors.request.use((config) => {
-  const token = getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  console.log("check config : ")
-  console.log(config)
-  return config;
-});
+// // Request Interceptor → Add Access Token (Before Sending a Request)
+// api.interceptors.request.use((config) => {
+//   const token = getAccessToken();
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+//   console.log("check config : ")
+//   console.log(config)
+//   return config;
+// });
 
-// Response Interceptor → Handle Expired Token
-api.interceptors.response.use(
-  (res) => res,
-  async (error) => {
-    const originalRequest = error.config;
-    console.log("check err: ")
-    console.log(error)
-    // If token expired and not already retried
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+// // Response Interceptor → Handle Expired Token
+// api.interceptors.response.use(
+//   (res) => res,
+//   async (error) => {
+//     const originalRequest = error.config;
+//     console.log("check err: ")
+//     console.log(error)
+//     // If token expired and not already retried
+//     if (error.response?.status === 401 && !originalRequest._retry) {
 
-      try {
-        console.log("try to get refresh token: ")
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/refresh-token`,
-          {},
-          { withCredentials: true }
-        );
+//       try {
+//         console.log("try to get refresh token: ")
+//         const res = await axios.post(
+//           `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/refresh-token`,
+//           {},
+//           { withCredentials: true }
+//         );
 
-        const newAccessToken = res.data.accessToken;
-        setAccessToken(newAccessToken);
+//         const newAccessToken = res.data.accessToken;
+//         setAccessToken(newAccessToken);
 
-        // Retry original request with new access token
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return api(originalRequest);
-      } catch (err) {
-        // Refresh token failed — force logout
-        console.error('Refresh failed. Redirecting to login.', err);
+//         // Retry original request with new access token
+//         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+//         originalRequest._retry = true;
 
-        console.log("check localtion path: ", )
-        console.log("check location search: ", )
+//         return api(originalRequest);
 
-        // Save last path before redirect (in sign-inpage after login sucess it will redirect to that path)
-        if (typeof window !== 'undefined') {
-            const currentPath = window.location.pathname + window.location.search;
-            localStorage.setItem('redirectAfterLogin', currentPath); // save to localStorage
-            window.location.href = '/auth/sign-in';
-        }
-      }
-    }
+//       } catch (err) {
 
-    return Promise.reject(error);
-  }
-);
+//         setAccessToken(null);
+
+//         // Refresh token failed — force logout
+//         console.error('Refresh failed. Redirecting to login.', err);
+
+//         console.log("check localtion path: ", window.location.pathname)
+//         console.log("check location search: ", window.location.search)
+
+//         // Save last path before redirect (in sign-inpage after login sucess it will redirect to that path)
+//         if (typeof window !== 'undefined') {
+//             const currentPath = window.location.pathname + window.location.search;
+//             localStorage.setItem('redirectAfterLogin', currentPath); // save to localStorage
+//             window.location.href = '/auth/sign-in';
+//         }
+//       }
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
 
 export default api;
