@@ -66,7 +66,7 @@ export default function SignUpPage() {
         imgPath: imageUrl,
       };
 
-      await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user`, userPayload);
+      await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/register`, userPayload);
 
       await Swal.fire({
         icon: "success",

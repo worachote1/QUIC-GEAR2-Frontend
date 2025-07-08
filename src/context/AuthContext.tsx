@@ -1,7 +1,9 @@
-// contexts/AuthContext.tsx
-import React, { createContext, useContext, useEffect, useState } from 'react';
+'use client';
+
+import React, { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react';
 import api from '@/lib/axios';
-import { useRouter } from 'next/router';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -20,40 +22,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
-  // 🔁 Refresh access token + fetch user profile
   const refreshAndLoadUser = async () => {
     try {
-      const res = await api.post('/auth/refresh-token'); // *** change this to give me (get new accessToken by existing refresh  token on cookie)
-      const newAccessToken = res.data.data.accessToken;
-      setAccessToken(newAccessToken);
+      
+      // Use plain axios to avoid interceptors
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/refresh-access-token-only`,
+        {},
+        { withCredentials: true }
+        );
 
-      const profileRes = await api.get('/user/profile', {
+      const newAccessToken = res.data.data.accessToken;
+
+      setAccessToken(newAccessToken);
+    
+      const profileRes = await axios.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user/profile`, {
         headers: { Authorization: `Bearer ${newAccessToken}` },
       });
+
       setUser(profileRes.data.data);
+
     } catch (err) {
+        console.warn('[AuthProvider] ❌ Refresh failed, user not logged in or refresh token is expired');
         setAccessToken(null);
         setUser(null);
-
-        console.log("check localtion path: ", window.location.pathname)
-        console.log("check location search: ", window.location.search)
-
-        // Save last path before redirect (in sign-inpage after login sucess it will redirect to that path)
-        if (typeof window !== 'undefined') {
-            const currentPath = window.location.pathname + window.location.search;
-            localStorage.setItem('redirectAfterLogin', currentPath); // save to localStorage
-            window.location.href = '/auth/sign-in';
-        }
     }
   };
 
-  // 🔐 On load or refresh: try auto login
+  // 1. On first load, try to refresh token and get user
   useEffect(() => {
     refreshAndLoadUser();
   }, []);
 
-  // ⚙️ Attach Interceptors using latest token
-  useEffect(() => {
+ // 2. Setup interceptors — run before UI paint to prevent race conditions
+ // set interceptors before any child calls API (Use `useLayoutEffect` to guarantee it runs before paint (safer for SSR or fast renders)
+  useLayoutEffect(() => {
     const requestInterceptor = api.interceptors.request.use((config) => {
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
@@ -68,20 +71,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
-
           try {
-            const res = await api.post('/auth/refresh-token');
+            console.log("yw1")
+            const res = await axios.post(
+              `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/refresh-token`,
+              {},
+              { withCredentials: true } // don't forget this if you store refresh token in cookies
+            );
             const newToken = res.data.data.accessToken;
+            
             setAccessToken(newToken);
 
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+            console.log('[Interceptor] 🔄 Refreshed token and retrying');
+
             return api(originalRequest);
           } catch (err) {
+            console.warn('[Interceptor] ❌ Refresh failed → redirecting');
+
             setAccessToken(null);
             setUser(null);
+
             const path = window.location.pathname + window.location.search;
             localStorage.setItem('redirectAfterLogin', path);
-            router.push('/auth/sign-in');
+            router.push("/auth/sign-in");
           }
         }
 
@@ -89,6 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
+    // Cleanup on unmount
     return () => {
       api.interceptors.request.eject(requestInterceptor);
       api.interceptors.response.eject(responseInterceptor);

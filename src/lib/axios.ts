@@ -3,12 +3,8 @@ import axios from 'axios';
 
 
 /**
-    This file creates a customized axios instance with built-in logic to:
-        - Automatically attach access tokens to requests
-        - Detect if a token is expired
-        - Automatically refresh the token and retry the failed request
-        - Redirect to login if the refresh fails
- */
+  plain Axios instance (NO interceptors)
+*/
 
 
 // Setup Custom Axios Instance
@@ -16,6 +12,15 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_QUIC_GEAR2_API, // use .env
   withCredentials: true, // send cookie refreshToken
 });
+
+
+/**
+    This file creates a customized axios instance with built-in logic to:
+        - Automatically attach access tokens to requests
+        - Detect if a token is expired
+        - Automatically refresh the token and retry the failed request
+        - Redirect to login if the refresh fails
+ */
 
 // // Request Interceptor → Add Access Token (Before Sending a Request)
 // api.interceptors.request.use((config) => {
