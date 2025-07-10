@@ -1,52 +1,44 @@
 "use client";
 
 import { useForm, Controller } from "react-hook-form";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from "sweetalert2";
 import axios from "axios";
-
-interface IAuctionFormData {
-  name: string;
-  brand: string;
-  type: string;
-  subType: string;
-  isWireless: string;
-  isRGB: string;
-  imgPath: FileList;
-  description?: string;
-  startPrice: number;
-  buyOutPrice: number;
-  startAuctionDate: Date;
-  endAuctionDate: Date;
-}
+import { brandList, subTypeMap, typeList } from "@/constants/productOptions";
+import { validateEndDate, validateStartDate } from "@/utils/auctionValidation";
+import { useAuth } from "@/context/AuthContext";
+import { IAuctionFormData } from "@/types/auction";
 
 export default function CreateAuctionPage() {
+  const { user } = useAuth()
+  console.log("check user")
+  console.log(user)
   const {
     register,
     handleSubmit,
+    watch,
     control,
+    getValues,
     reset,
     formState: { errors },
   } = useForm<IAuctionFormData>();
-  const router = useRouter();
 
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(new Date());
+  const router = useRouter();
+  const selectedType = watch("type");
 
   const onSubmit = async (data: IAuctionFormData) => {
     try {
-      // === Upload Images ===
-      const imageFormData = new FormData();
+      // Upload images first
+      const formData = new FormData();
       Array.from(data.imgPath).forEach((file) => {
-        imageFormData.append("images", file);
+        formData.append("images", file);
       });
 
       const uploadRes = await axios.post(
         `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/multiple`,
-        imageFormData,
+        formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
@@ -54,7 +46,7 @@ export default function CreateAuctionPage() {
 
       const image_urls = uploadRes.data.image_urls;
 
-      // === Create AuctionProduct ===
+      // Create AuctionProduct
       const productPayload = {
         name: data.name,
         brand: data.brand,
@@ -66,16 +58,17 @@ export default function CreateAuctionPage() {
         description: data.description || "",
       };
 
-      const prodRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auction-product`,
+      const productRes = await axios.post(
+        `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auction-products`,
         productPayload
       );
 
-      const productId = prodRes.data.id;
-
-      // === Create Auction ===
+      const productId = productRes.data.data.id;
+      const sellerId = user?.id
+      // Create Auction
       const auctionPayload = {
         productId,
+        sellerId,
         startPrice: +data.startPrice,
         buyOutPrice: +data.buyOutPrice,
         startAuctionDate: data.startAuctionDate,
@@ -84,72 +77,174 @@ export default function CreateAuctionPage() {
 
       await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auction`, auctionPayload);
 
-      await Swal.fire("Success", "Auction created", "success");
+      await Swal.fire({
+        icon: "success",
+        title: "Auction Created",
+        confirmButtonText: "OK",
+      });
+
       reset();
-      router.push("/auction/list");
+      // router.push("/auction/list");
     } catch (err: any) {
-      Swal.fire("Error", err?.response?.data?.message || err.message, "error");
+      Swal.fire({
+        icon: "error",
+        title: "Creation Failed",
+        text: err.response?.data?.message || err.message,
+      });
     }
   };
 
   return (
     <div className="max-w-3xl mx-auto p-6 mt-6">
       <h1 className="text-2xl font-bold text-center mb-6">Create Auction</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6">
-        <input {...register("name", { required: "Name is required" })} placeholder="Name" className="border p-2" />
-        <input {...register("brand", { required: "Brand is required" })} placeholder="Brand" className="border p-2" />
-        <input {...register("type", { required: "Type is required" })} placeholder="Type" className="border p-2" />
-        <input {...register("subType", { required: "SubType is required" })} placeholder="SubType" className="border p-2" />
-
-        <div className="flex gap-4">
-          <label><input type="radio" value="true" {...register("isWireless", { required: true })} /> Wireless</label>
-          <label><input type="radio" value="false" {...register("isWireless", { required: true })} /> Wired</label>
+      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6" encType="multipart/form-data">
+        {/* name */}
+        <div>
+          <label className="block mb-1 font-medium">Product Name</label>
+          <input {...register("name", { required: "Name is required" })} className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-blue-500" placeholder="Enter product name" />
+          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
         </div>
 
-        <div className="flex gap-4">
-          <label><input type="radio" value="true" {...register("isRGB", { required: true })} /> RGB</label>
-          <label><input type="radio" value="false" {...register("isRGB", { required: true })} /> No RGB</label>
+        {/* brand */}
+        <div>
+          <label className="block mb-1 font-medium">Brand</label>
+          <select {...register("brand", { required: "Brand is required" })} className="w-full border px-4 py-2 rounded-md">
+            <option value="">Select Brand</option>
+            {brandList.map((b) => <option key={b} value={b}>{b}</option>)}
+          </select>
+          {errors.brand && <p className="text-red-500 text-sm mt-1">{errors.brand.message}</p>}
         </div>
 
-        <textarea {...register("description")} placeholder="Description" className="border p-2" />
+        {/* type */}
+        <div>
+          <label className="block mb-1 font-medium">Type</label>
+          <select {...register("type", { required: "Type is required" })} className="w-full border px-4 py-2 rounded-md">
+            <option value="">Select Type</option>
+            {typeList.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+          {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type.message}</p>}
+        </div>
 
-        <input type="file" {...register("imgPath", { required: true })} multiple className="border p-2" />
+        {/* subType */}
+        <div>
+          <label className="block mb-1 font-medium">Sub-Type</label>
+          <select {...register("subType", { required: "Sub-Type is required" })} className="w-full border px-4 py-2 rounded-md">
+            <option value="">Select Sub-Type</option>
+            {subTypeMap[selectedType]?.map((sub) => (
+              <option key={sub} value={sub}>{sub}</option>
+            ))}
+          </select>
+          {errors.subType && <p className="text-red-500 text-sm mt-1">{errors.subType.message}</p>}
+        </div>
 
-        <input type="number" {...register("startPrice", { required: true })} placeholder="Start Price" className="border p-2" />
-        <input type="number" {...register("buyOutPrice", { required: true })} placeholder="Buy Out Price" className="border p-2" />
+        {/* isWireless */}
+        <div>
+          <label className="block mb-1 font-medium">Is Wireless</label>
+          <div className="flex gap-6">
+            <label><input type="radio" value="true" {...register("isWireless", { required: "Select wireless option" })} /> Yes</label>
+            <label><input type="radio" value="false" {...register("isWireless", { required: "Select wireless option" })} /> No</label>
+          </div>
+          {errors.isWireless && <p className="text-red-500 text-sm mt-1">{errors.isWireless.message}</p>}
+        </div>
 
-        <Controller
-          control={control}
-          name="startAuctionDate"
-          rules={{ required: true }}
-          render={({ field }) => (
-            <DatePicker
-              placeholderText="Select start date"
-              selected={field.value}
-              onChange={field.onChange}
-              showTimeSelect
-              dateFormat="Pp"
-              className="border p-2 w-full"
-            />
+        {/* isRGB */}
+        <div>
+          <label className="block mb-1 font-medium">Is RGB</label>
+          <div className="flex gap-6">
+            <label><input type="radio" value="true" {...register("isRGB", { required: "Select RGB option" })} /> Yes</label>
+            <label><input type="radio" value="false" {...register("isRGB", { required: "Select RGB option" })} /> No</label>
+          </div>
+          {errors.isRGB && <p className="text-red-500 text-sm mt-1">{errors.isRGB.message}</p>}
+        </div>
+
+        {/* startPrice */}
+        <div>
+          <label className="block mb-1 font-medium">Start Price</label>
+          <input type="number" {...register("startPrice", { required: "Start Price is required", valueAsNumber: true, min: { value: 0, message: "Start Price must be non-negative" } })} className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-blue-500" placeholder="Enter start price" />
+          {errors.startPrice && <p className="text-red-500 text-sm mt-1">{errors.startPrice.message}</p>}
+        </div>
+
+        {/* buyOutPrice */}
+        <div>
+          <label className="block mb-1 font-medium">Buy Out Price</label>
+          <input type="number" {...register("buyOutPrice", { required: "Buy Out Price is required", valueAsNumber: true, min: { value: 0, message: "Buy Out Price must be non-negative" } })} className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-blue-500" placeholder="Enter buy out price"/>
+          {errors.buyOutPrice && <p className="text-red-500 text-sm mt-1">{errors.buyOutPrice.message}</p>}
+        </div>
+
+        {/* startAuctionDate */}
+        <div>
+          <label className="block mb-1 font-medium">Start Auction Date</label>
+          <Controller
+            name="startAuctionDate"
+            control={control}
+            rules={{
+              required: "Start date is required",
+              validate: validateStartDate(getValues),
+            }}
+            render={({ field }) => (
+              <DatePicker
+                selected={field.value}
+                onChange={field.onChange}
+                showTimeSelect
+                dateFormat="Pp"
+                className="w-full border px-4 py-2 rounded-md"
+              />
+            )}
+          />
+          {errors.startAuctionDate && (
+            <p className="text-red-500 text-sm mt-1">{errors.startAuctionDate.message}</p>
           )}
-        />
-        <Controller
-          control={control}
-          name="endAuctionDate"
-          rules={{ required: true }}
-          render={({ field }) => (
-            <DatePicker
-              placeholderText="Select end date"
-              selected={field.value}
-              onChange={field.onChange}
-              showTimeSelect
-              dateFormat="Pp"
-              className="border p-2 w-full"
-            />
-          )}
-        />
+        </div>
 
-        <button type="submit" className="bg-blue-600 text-white p-2 rounded">Create Auction</button>
+        {/* endAuctionDate */}
+        <div>
+          <label className="block mb-1 font-medium">End Auction Date</label>
+          <Controller
+            name="endAuctionDate"
+            control={control}
+            rules={{
+              required: "End date is required",
+              validate: validateEndDate(getValues),
+            }}
+            render={({ field }) => (
+              <DatePicker
+                selected={field.value}
+                onChange={field.onChange}
+                showTimeSelect
+                dateFormat="Pp"
+                className="w-full border px-4 py-2 rounded-md"
+              />
+            )}
+          />
+          {errors.endAuctionDate && (
+            <p className="text-red-500 text-sm mt-1">{errors.endAuctionDate.message}</p>
+          )}
+        </div>
+
+        {/* image upload */}
+        <div>
+          <label className="block mb-1 font-medium">Upload Product Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            {...register("imgPath", { required: "At least one image is required" })}
+            className="w-full text-slate-500 font-medium text-sm bg-white border file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-gray-100 file:hover:bg-gray-200 file:text-slate-500 rounded"
+          />
+          <p className="text-xs text-slate-500 mt-2">PNG, JPG, JPEG and WEBP are allowed.</p>
+          {errors.imgPath && <p className="text-red-500 text-sm mt-1">{errors.imgPath.message}</p>}
+        </div>
+
+        {/* description */}
+        <div>
+          <label className="block mb-1 font-medium">Description</label>
+          <textarea rows={4} {...register("description")} className="w-full border px-4 py-2 rounded-md" />
+        </div>
+
+        {/* submit */}
+        <button type="submit" className="bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700">
+          Create Auction
+        </button>
       </form>
     </div>
   );

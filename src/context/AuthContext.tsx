@@ -4,11 +4,12 @@ import React, { createContext, useContext, useEffect, useLayoutEffect, useState 
 import api from '@/lib/axios';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { IUser } from '@/types/user';
 
 interface AuthContextType {
   accessToken: string | null;
   setAccessToken: (token: string | null) => void;
-  user: any;
+  user: IUser | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
