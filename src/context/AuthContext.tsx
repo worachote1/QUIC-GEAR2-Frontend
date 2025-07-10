@@ -72,7 +72,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
           try {
-            console.log("yw1")
             const res = await axios.post(
               `${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/refresh-token`,
               {},
