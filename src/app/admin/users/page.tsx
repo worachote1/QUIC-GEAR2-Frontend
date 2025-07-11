@@ -6,8 +6,8 @@ import Swal from 'sweetalert2'
 import { profile_default_imgPath } from '@/constants/profileImgPath'
 import { truncateWords } from '@/utils/truncateWords';
 import { getPublicImageUrl } from '@/utils/getPublicImageUrl';
-import { useAdminUsers } from '@/hooks/admin/useAdminUsers'
-import { useAdminUserActions } from '@/hooks/admin/useAdminUserActions'
+import { useAdminUsers } from '@/hooks/admin/users/useAdminUsers'
+import { useAdminUserActions } from '@/hooks/admin/users/useAdminUserActions'
 
 export default function AdminUserPage() {
   const { users, setUsers, loading } = useAdminUsers()

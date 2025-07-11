@@ -2,9 +2,9 @@
 
 import { brandList, subTypeMap, typeList } from '@/constants/productOptions'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { useAdminProductActions } from '@/hooks/admin/useAdminProductActions'
-import { useAdminProducts } from '@/hooks/admin/useAdminProducts'
-import { useAdminProductEditor } from '@/hooks/admin/useAdminProductEditor'
+import { useAdminProductActions } from '@/hooks/admin/products/useAdminProductActions'
+import { useAdminProducts } from '@/hooks/admin/products/useAdminProducts'
+import { useAdminProductEditor } from '@/hooks/admin/products/useAdminProductEditor'
 import { useState } from 'react';
 import { PaginationAdmin } from '@/components/paginations/PaginationAdmin';
 

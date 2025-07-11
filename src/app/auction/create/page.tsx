@@ -13,8 +13,6 @@ import { IAuctionFormData } from "@/types/auction";
 
 export default function CreateAuctionPage() {
   const { user } = useAuth()
-  console.log("check user")
-  console.log(user)
   const {
     register,
     handleSubmit,
