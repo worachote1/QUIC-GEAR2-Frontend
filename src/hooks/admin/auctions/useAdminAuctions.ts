@@ -10,7 +10,7 @@ export function useAdminAuctions() {
     const fetchAuctions = async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auction`);
-        setAuctions(res.data.auctions);
+        setAuctions(res.data.data);
       } catch (err) {
         console.error("Failed to load auctions", err);
       } finally {

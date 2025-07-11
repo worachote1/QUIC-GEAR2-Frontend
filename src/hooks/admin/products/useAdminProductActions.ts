@@ -20,17 +20,11 @@ export function useAdminProductActions(setProducts: React.Dispatch<React.SetStat
       if (prod.imgPath?.length) {
         await api.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/delete`, {
           paths: prod.imgPath,
-        }, 
-        {
-          withCredentials: true
         })
       }
 
       // Delete product
-      await api.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${prod.id}`, 
-      {
-        withCredentials: true
-      })
+      await api.delete(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${prod.id}`)
       setProducts(prev => prev.filter(p => p.id !== prod.id))
       Swal.fire('Deleted!', '', 'success')
     } catch {
@@ -68,7 +62,6 @@ export function useAdminProductActions(setProducts: React.Dispatch<React.SetStat
           formData,
           {
             headers: { 'Content-Type': 'multipart/form-data' },
-            withCredentials: true
           }
         )
 
@@ -77,19 +70,13 @@ export function useAdminProductActions(setProducts: React.Dispatch<React.SetStat
         // Delete old images
         await api.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/file-upload/delete`, {
           paths: editing.imgPath ?? [],
-        }, 
-        {
-          withCredentials: true
         })
 
         payload.imgPath = newImagePaths
       }
 
       // Update the product
-      await api.patch(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${editing.id}`, payload,
-      {
-        withCredentials: true
-      })
+      await api.patch(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product/${editing.id}`, payload)
 
       // Update UI state
       setProducts(prev =>

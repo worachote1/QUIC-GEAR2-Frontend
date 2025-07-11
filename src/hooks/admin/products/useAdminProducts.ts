@@ -13,10 +13,7 @@ export function useAdminProducts(page: number, limit: number) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await api.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product?page=${page}&limit=${limit}`,
-        {
-          withCredentials: true
-        })
+        const res = await api.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product?page=${page}&limit=${limit}`)
         setProducts(res.data.data.items)
         setTotalPages(res.data.meta.totalPages);
       } catch (err) {
