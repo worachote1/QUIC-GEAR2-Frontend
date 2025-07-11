@@ -5,6 +5,7 @@ import { useAdminAuctions } from '@/hooks/admin/auctions/useAdminAuctions';
 import { useAdminAuctionActions } from '@/hooks/admin/auctions/useAdminAuctionActions';
 import { AUCTION_STATUS, statusTransitions } from '@/constants/auctionStatus';
 import { AuctionStatus } from '@/enum/enum';
+import { getAuctionStatusClass } from '@/utils/auctionStyle';
 
 export default function AdminAuctionPage() {
   const { auctions, loading, setAuctions } = useAdminAuctions();
@@ -37,17 +38,21 @@ export default function AdminAuctionPage() {
                 <td className="px-4 py-2">฿{a.buyOutPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 <td className="px-4 py-2">{new Date(a.startAuctionDate).toLocaleString()}</td>
                 <td className="px-4 py-2">{new Date(a.endAuctionDate).toLocaleString()}</td>
-                <td className="px-4 py-2 font-medium">{a.auctionStatus}</td>
+                <td className="px-4 py-2">
+                  <span className={`px-2 py-1 text-xs font-semibold rounded ${getAuctionStatusClass(a.auctionStatus)}`}>
+                    {a.auctionStatus.replace("_", " ")}
+                  </span>
+                </td>
                 <td className="px-4 py-2">
                   <select
-                    className="border px-2 py-1 rounded text-sm"
-                    value=""
+                    className="border px-3 py-1 rounded text-sm bg-white text-gray-800 shadow-sm hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    defaultValue=""
                     onChange={(e) => updateAuctionStatus(a.id, e.target.value as AuctionStatus)}
                     disabled={statusTransitions[a.auctionStatus].length === 0}
                   >
                     <option value="" disabled>Change Status</option>
-                    {statusTransitions[a.auctionStatus].map((status) => (
-                      <option key={status} value={status}>{status}</option>
+                    {statusTransitions[a.auctionStatus].map(status => (
+                      <option key={status} value={status}>{status.replace("_", " ")}</option>
                     ))}
                   </select>
                 </td>
