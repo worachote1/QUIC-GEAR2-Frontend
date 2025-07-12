@@ -2,11 +2,12 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { IAuction } from '@/types/auction';
 import { AuctionStatus } from '@/enum/enum';
+import api from '@/lib/axios';
 
 export function useAdminAuctionActions(setAuctions: React.Dispatch<React.SetStateAction<IAuction[]>>) {
   const updateAuctionStatus = async (auctionId: number, newStatus: AuctionStatus) => {
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auction/${auctionId}`, {
+      await api.patch(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auction/${auctionId}`, {
         auctionStatus: newStatus,
       });
 
