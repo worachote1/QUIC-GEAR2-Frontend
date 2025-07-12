@@ -7,12 +7,16 @@ import { useAdminProducts } from '@/hooks/admin/products/useAdminProducts'
 import { useAdminProductEditor } from '@/hooks/admin/products/useAdminProductEditor'
 import { useState } from 'react';
 import { PaginationAdmin } from '@/components/paginations/PaginationAdmin';
+import { useSearchParams } from 'next/navigation';
+import { AdminProductFilters } from '@/components/filter/AdminProductFilters';
+import { AdminProductFilterChips } from '@/components/filter/AdminProductFilterChips';
 
 export default function AdminProductPage() {
+  const searchParams = useSearchParams();
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { products, loading, setProducts, totalPages } = useAdminProducts(page, limit)
+  const { products, loading, setProducts, totalPages } = useAdminProducts(page, limit, searchParams)
 
   const {
     editing,
@@ -31,6 +35,11 @@ export default function AdminProductPage() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Admin: Products</h1>
 
+      {/* Filters + Tags */}
+      <AdminProductFilters />
+      <AdminProductFilterChips />
+
+      {/* Table data */}
       {loading ? <p>Loading…</p> : (
         <table className="w-full text-sm text-left mt-4">
           <thead className="bg-gray-50">

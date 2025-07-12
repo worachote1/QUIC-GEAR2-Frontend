@@ -5,6 +5,8 @@ import { brandList, typeList, subTypeMap } from '@/constants/productOptions';
 import { useEffect, useState } from 'react';
 import { debounce } from '@/utils/debounce';
 
+// complete filtering UI including `type`, `subType`, `brand`, `isRGB`, `isWireless`, `minPrice`, and `maxPrice`
+
 export function AdminProductFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,6 +34,19 @@ export function AdminProductFilters() {
     updateURL(filters);
     return () => updateURL.cancel();
   }, [filters]);
+
+  // Now: When the URL changes (from chip delete or clear), `filters` state will also update.
+  useEffect(() => {
+    setFilters({
+      type: searchParams.get('type') ?? '',
+      subType: searchParams.get('subType') ?? '',
+      brand: searchParams.get('brand') ?? '',
+      isRGB: searchParams.get('isRGB') ?? '',
+      isWireless: searchParams.get('isWireless') ?? '',
+      minPrice: searchParams.get('minPrice') ?? '',
+      maxPrice: searchParams.get('maxPrice') ?? '',
+    });
+  }, [searchParams.toString()]);
 
   return (
     <div className="mb-4 flex gap-4 flex-wrap items-end">

@@ -1,3 +1,5 @@
+// a custom debounce utility (no Lodash needed)
+
 export function debounce<T extends (...args: any[]) => void>(func: T, wait: number) {
   let timeout: ReturnType<typeof setTimeout>;
   const debounced = (...args: Parameters<T>) => {
