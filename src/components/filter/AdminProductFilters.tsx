@@ -32,7 +32,7 @@ export function AdminProductFilters() {
 
   useEffect(() => {
     updateURL(filters);
-    return () => updateURL.cancel();
+    return () => updateURL.cancel(); // this cleanup function cancels the old debounce, so only the latest one runs
   }, [filters]);
 
   // Now: When the URL changes (from chip delete or clear), `filters` state will also update.

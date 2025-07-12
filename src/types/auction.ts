@@ -54,3 +54,11 @@ export interface IAuctionFormData {
   startAuctionDate: Date;
   endAuctionDate: Date;
 }
+
+export interface IAuctionRemainingTime {
+  total: number;
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}

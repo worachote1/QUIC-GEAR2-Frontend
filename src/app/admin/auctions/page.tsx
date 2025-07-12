@@ -5,7 +5,7 @@ import { useAdminAuctions } from '@/hooks/admin/auctions/useAdminAuctions';
 import { useAdminAuctionActions } from '@/hooks/admin/auctions/useAdminAuctionActions';
 import { AUCTION_STATUS, statusTransitions } from '@/constants/auctionStatus';
 import { AuctionStatus } from '@/enum/enum';
-import { getAuctionStatusClass } from '@/utils/auctionStyle';
+import { getAuctionStatusClass } from '@/utils/auction/auctionStyle';
 
 export default function AdminAuctionPage() {
   const { auctions, loading, setAuctions } = useAdminAuctions();
