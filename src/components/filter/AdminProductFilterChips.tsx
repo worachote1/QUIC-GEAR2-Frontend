@@ -29,14 +29,19 @@ export function AdminProductFilterChips() {
   if (activeFilters.length === 0) return null;
 
   return (
-    <div className="mb-4 flex gap-2 flex-wrap">
+    <div className="mb-4 flex flex-wrap gap-2">
       {activeFilters.map(({ key, value }) => (
-        <div key={key} className="bg-gray-100 border px-2 py-1 text-sm rounded flex items-center gap-1">
-          <span>{key}: {value}</span>
-          <button onClick={() => clearFilter(key)} className="text-red-500 text-xs">✕</button>
+        <div key={key + value} className="flex items-center bg-blue-100 text-blue-800 border border-blue-300 px-3 py-1 rounded-full text-sm">
+          <span className="mr-2 font-medium">{key}: {value}</span>
+          <button onClick={() => clearFilter(key)} className="text-blue-700 hover:text-red-500">✕</button>
         </div>
       ))}
-      <button onClick={() => router.push('/admin/products')} className="text-sm text-blue-600 underline">Clear all</button>
+      <button
+        onClick={() => router.push('/admin/products')}
+        className="text-sm underline text-blue-600 hover:text-blue-800 ml-2"
+      >
+        Clear all
+      </button>
     </div>
   );
 }
