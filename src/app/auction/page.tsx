@@ -36,7 +36,9 @@ export default function AuctionListPage() {
   if (loading) return <p className="text-center mt-10">Loading auctions...</p>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+    // grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4
+    // flex flex-wrap gap-6 p-4 justify-center
+    <div className="flex flex-wrap gap-6 p-4 justify-center">
       {auctions.map((auction) => (
         <AuctionCard key={auction.id} auction={auction} onExpire={handleAuctionExpire} />
       ))}
