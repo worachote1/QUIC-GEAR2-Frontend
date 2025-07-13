@@ -153,16 +153,55 @@ export function AdminAuctionFilters() {
       </div>
       <div>
         <label className="block text-sm font-medium">Start Date To</label>
-        <input type="date" className="border px-2 py-1" value={filters.startDateTo} onChange={e => setFilters(prev => ({ ...prev, startDateTo: e.target.value }))} />
+        {/* <input type="date" className="border px-2 py-1" value={filters.startDateTo} onChange={e => setFilters(prev => ({ ...prev, startDateTo: e.target.value }))} /> */}
+        <DatePicker
+          selected={filters.startDateTo ? new Date(filters.startDateTo) : null}
+          onChange={(date) =>
+            setFilters((prev) => ({
+              ...prev,
+              startDateTo: date ? date.toISOString() : '',
+            }))
+          }
+          showTimeSelect
+          dateFormat="Pp"
+          placeholderText="Start From"
+          className="border px-2 py-1 rounded"
+        />
       </div>
 
       <div>
         <label className="block text-sm font-medium">End Date From</label>
-        <input type="date" className="border px-2 py-1" value={filters.endDateFrom} onChange={e => setFilters(prev => ({ ...prev, endDateFrom: e.target.value }))} />
+        {/* <input type="date" className="border px-2 py-1" value={filters.endDateFrom} onChange={e => setFilters(prev => ({ ...prev, endDateFrom: e.target.value }))} /> */}
+        <DatePicker
+          selected={filters.endDateFrom ? new Date(filters.endDateFrom) : null}
+          onChange={(date) =>
+            setFilters((prev) => ({
+              ...prev,
+              endDateFrom: date ? date.toISOString() : '',
+            }))
+          }
+          showTimeSelect
+          dateFormat="Pp"
+          placeholderText="Start From"
+          className="border px-2 py-1 rounded"
+        />
       </div>
       <div>
         <label className="block text-sm font-medium">End Date To</label>
-        <input type="date" className="border px-2 py-1" value={filters.endDateTo} onChange={e => setFilters(prev => ({ ...prev, endDateTo: e.target.value }))} />
+        {/* <input type="date" className="border px-2 py-1" value={filters.endDateTo} onChange={e => setFilters(prev => ({ ...prev, endDateTo: e.target.value }))} /> */}
+        <DatePicker
+          selected={filters.endDateTo ? new Date(filters.endDateTo) : null}
+          onChange={(date) =>
+            setFilters((prev) => ({
+              ...prev,
+              endDateTo: date ? date.toISOString() : '',
+            }))
+          }
+          showTimeSelect
+          dateFormat="Pp"
+          placeholderText="Start From"
+          className="border px-2 py-1 rounded"
+        />
       </div>
     </div>
   );

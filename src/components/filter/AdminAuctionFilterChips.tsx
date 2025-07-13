@@ -38,8 +38,14 @@ export function AdminAuctionFilterChips() {
         if (value === 'true') displayValue = 'Yes';
         else if (value === 'false') displayValue = 'No';
 
+        // Format numbers or numeric strings
+        else if (!isNaN(Number(value))) {
+          const num = Number(value);
+          displayValue = `฿${num.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        }
+
         // Format dates using your helper
-        if (key.includes('Date')) {
+        else if (key.includes('Date')) {
           displayValue = formatDateToReadable(value!);
         }
 

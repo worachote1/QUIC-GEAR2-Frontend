@@ -45,6 +45,12 @@ export function AdminProductFilterChips() {
         if (value === 'true') displayValue = 'Yes';
         else if (value === 'false') displayValue = 'No';
 
+        // Format numbers or numeric strings
+        else if (!isNaN(Number(value))) {
+          const num = Number(value);
+          displayValue = `฿${num.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        }
+
         return (
           <div
             key={key + value}
