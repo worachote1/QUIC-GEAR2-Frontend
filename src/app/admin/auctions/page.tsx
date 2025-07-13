@@ -6,14 +6,24 @@ import { useAdminAuctionActions } from '@/hooks/admin/auctions/useAdminAuctionAc
 import { AUCTION_STATUS, statusTransitions } from '@/constants/auctionStatus';
 import { AuctionStatus } from '@/enum/enum';
 import { getAuctionStatusClass } from '@/utils/auction/auctionStyle';
+import { PaginationAdmin } from '@/components/paginations/PaginationAdmin';
+import { useSearchParams } from 'next/navigation';
 
 export default function AdminAuctionPage() {
-  const { auctions, loading, setAuctions } = useAdminAuctions();
+  const searchParams = useSearchParams();
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const { auctions, loading, setAuctions, totalPages } = useAdminAuctions(page, limit, searchParams);
   const { updateAuctionStatus } = useAdminAuctionActions(setAuctions);
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Admin: Auctions</h1>
+
+      {/* Filters + Tags */}
+      {/* <AdminAuctionFilters /> */}
+      {/* <AdminAuctionFilterChips /> */}
 
       {loading ? <p>Loading…</p> : (
         <table className="w-full text-sm text-left mt-4">
@@ -61,6 +71,10 @@ export default function AdminAuctionPage() {
           </tbody>
         </table>
       )}
+
+      {/* Pagination controls */}
+      <PaginationAdmin page={page} setPage={setPage} totalPages={totalPages} />
+
     </div>
   );
 }

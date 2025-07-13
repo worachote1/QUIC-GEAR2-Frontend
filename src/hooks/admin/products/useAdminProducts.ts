@@ -21,7 +21,7 @@ export function useAdminProducts(page: number, limit: number, searchParams: URLS
       try {
         const res = await api.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/product?${query.toString()}`)
 
-        setProducts(res.data.data.items)
+        setProducts(res.data.data)
         setTotalPages(res.data.meta.totalPages);
       } catch (err) {
         console.error('Error fetching products:', err)
