@@ -1,0 +1,33 @@
+export const AUCTION_FILTER_KEYS = [
+  'brand',
+  'type',
+  'subType',
+  'isWireless',
+  'isRGB',
+  'auctionStatus',
+  'minStartPrice',
+  'maxStartPrice',
+  'minBuyOutPrice',
+  'maxBuyOutPrice',
+  'startDateFrom',
+  'startDateTo',
+  'endDateFrom',
+  'endDateTo',
+];
+
+export const AUCTION_FILTER_LABELS: Record<string, string> = {
+  brand: 'Brand',
+  type: 'Type',
+  subType: 'Sub-Type',
+  isWireless: 'Wireless',
+  isRGB: 'RGB',
+  auctionStatus: 'Status',
+  minStartPrice: 'Min Start Price',
+  maxStartPrice: 'Max Start Price',
+  minBuyOutPrice: 'Min Buyout Price',
+  maxBuyOutPrice: 'Max Buyout Price',
+  startDateFrom: 'Start Date From',
+  startDateTo: 'Start Date To',
+  endDateFrom: 'End Date From',
+  endDateTo: 'End Date To',
+};

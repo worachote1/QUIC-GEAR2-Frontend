@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { brandList, typeList, subTypeMap } from '@/constants/productOptions';
+import { brandList, typeList, subTypeMap } from '@/constants/product/productOptions';
 import { useEffect, useState } from 'react';
 import { debounce } from '@/utils/debounce';
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import { profile_default_imgPath } from '@/constants/profileImgPath'
+import { profile_default_imgPath } from '@/constants/product/profileImgPath'
 import { truncateWords } from '@/utils/truncateWords';
 import { getPublicImageUrl } from '@/utils/getPublicImageUrl';
 import { useAdminUsers } from '@/hooks/admin/users/useAdminUsers'

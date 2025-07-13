@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { brandList, subTypeMap, typeList } from "@/constants/productOptions";
+import { brandList, subTypeMap, typeList } from "@/constants/product/productOptions";
 import { validateEndDate, validateStartDate } from "@/utils/auction/auctionValidation";
 import { useAuth } from "@/context/AuthContext";
 import { IAuctionFormData } from "@/types/auction";

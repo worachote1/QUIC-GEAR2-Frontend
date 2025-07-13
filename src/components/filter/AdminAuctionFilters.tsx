@@ -2,9 +2,11 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { AUCTION_STATUS } from '@/constants/auctionStatus';
-import { brandList, typeList, subTypeMap } from '@/constants/productOptions';
+import { AUCTION_STATUS } from '@/constants/auction/auctionStatus';
+import { brandList, typeList, subTypeMap } from '@/constants/product/productOptions';
 import { debounce } from '@/utils/debounce';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export function AdminAuctionFilters() {
   const router = useRouter();
@@ -134,7 +136,20 @@ export function AdminAuctionFilters() {
 
       <div>
         <label className="block text-sm font-medium">Start Date From</label>
-        <input type="date" className="border px-2 py-1" value={filters.startDateFrom} onChange={e => setFilters(prev => ({ ...prev, startDateFrom: e.target.value }))} />
+        {/* <input type="date" className="border px-2 py-1" value={filters.startDateFrom} onChange={e => setFilters(prev => ({ ...prev, startDateFrom: e.target.value }))} /> */}
+        <DatePicker
+          selected={filters.startDateFrom ? new Date(filters.startDateFrom) : null}
+          onChange={(date) =>
+            setFilters((prev) => ({
+              ...prev,
+              startDateFrom: date ? date.toISOString() : '',
+            }))
+          }
+          showTimeSelect
+          dateFormat="Pp"
+          placeholderText="Start From"
+          className="border px-2 py-1 rounded"
+        />
       </div>
       <div>
         <label className="block text-sm font-medium">Start Date To</label>

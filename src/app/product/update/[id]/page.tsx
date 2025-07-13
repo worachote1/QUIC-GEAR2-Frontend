@@ -6,7 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { IProductFormData } from "@/types/product";
-import { brandList, subTypeMap, typeList } from "@/constants/productOptions";
+import { brandList, subTypeMap, typeList } from "@/constants/product/productOptions";
 
 export default function EditProductPage() {
   const {

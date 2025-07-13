@@ -1,6 +1,6 @@
 'use client'
 
-import { brandList, subTypeMap, typeList } from '@/constants/productOptions'
+import { brandList, subTypeMap, typeList } from '@/constants/product/productOptions'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useAdminProductActions } from '@/hooks/admin/products/useAdminProductActions'
 import { useAdminProducts } from '@/hooks/admin/products/useAdminProducts'
