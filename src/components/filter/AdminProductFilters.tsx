@@ -27,7 +27,7 @@ export function AdminProductFilters() {
       if (value) params.set(key, value);
       else params.delete(key);
     });
-    router.push(`/admin/products?${params.toString()}`);
+    router.push(`?${params.toString()}`);
   }, 300);
 
   useEffect(() => {

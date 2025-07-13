@@ -33,7 +33,6 @@ export function AdminAuctionFilters() {
       if (value) params.set(key, value);
       else params.delete(key);
     });
-    params.set('page', '1');
     router.push(`?${params.toString()}`);
   }, 300);
 

@@ -9,6 +9,7 @@ import { getAuctionStatusClass } from '@/utils/auction/auctionStyle';
 import { PaginationAdmin } from '@/components/paginations/PaginationAdmin';
 import { useSearchParams } from 'next/navigation';
 import { AdminAuctionFilters } from '@/components/filter/AdminAuctionFilters';
+import { AdminAuctionFilterChips } from '@/components/filter/AdminAuctionFilterChips';
 
 export default function AdminAuctionPage() {
   const searchParams = useSearchParams();
@@ -24,7 +25,7 @@ export default function AdminAuctionPage() {
 
       {/* Filters + Tags */}
       <AdminAuctionFilters />
-      {/* <AdminAuctionFilterChips /> */}
+      <AdminAuctionFilterChips />
 
       {loading ? <p>Loading…</p> : (
         <table className="w-full text-sm text-left mt-4">
