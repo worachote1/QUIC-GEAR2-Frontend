@@ -73,8 +73,6 @@ export default function CreateAuctionPage() {
         endAuctionDate: data.endAuctionDate,
       };
 
-      console.log("check payload to see date")
-      console.log(auctionPayload)
       await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auction`, auctionPayload);
 
       await Swal.fire({

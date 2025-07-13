@@ -8,6 +8,7 @@ import { AuctionStatus } from '@/enum/enum';
 import { getAuctionStatusClass } from '@/utils/auction/auctionStyle';
 import { PaginationAdmin } from '@/components/paginations/PaginationAdmin';
 import { useSearchParams } from 'next/navigation';
+import { AdminAuctionFilters } from '@/components/filter/AdminAuctionFilters';
 
 export default function AdminAuctionPage() {
   const searchParams = useSearchParams();
@@ -22,7 +23,7 @@ export default function AdminAuctionPage() {
       <h1 className="text-2xl font-bold mb-4">Admin: Auctions</h1>
 
       {/* Filters + Tags */}
-      {/* <AdminAuctionFilters /> */}
+      <AdminAuctionFilters />
       {/* <AdminAuctionFilterChips /> */}
 
       {loading ? <p>Loading…</p> : (
@@ -31,8 +32,13 @@ export default function AdminAuctionPage() {
             <tr>
               <th className="px-4 py-2">ID</th>
               <th className="px-4 py-2">Product Name</th>
+              <th className="px-4 py-2">Brand</th>
+              <th className="px-4 py-2">Type</th>
+              <th className="px-4 py-2">Sub-Type</th>
+              <th className="px-4 py-2">Wireless</th>
+              <th className="px-4 py-2">RGB</th>
               <th className="px-4 py-2">Start Price</th>
-              <th className="px-4 py-2">Buy Out Price</th>
+              <th className="px-4 py-2">Buy Out Price</th>              
               <th className="px-4 py-2">Start</th>
               <th className="px-4 py-2">End</th>
               <th className="px-4 py-2">Status</th>
@@ -44,6 +50,11 @@ export default function AdminAuctionPage() {
               <tr key={a.id} className="border-b hover:bg-gray-50">
                 <td className="px-4 py-2">{a.id}</td>
                 <td className="px-4 py-2">{a.product?.name}</td>
+                <td className="px-4 py-2">{a.product?.id}</td>
+                <td className="px-4 py-2">{a.product?.name}</td>
+                <td className="px-4 py-2">{a.product?.brand}</td>
+                <td className="px-4 py-2">{a.product?.type}</td>
+                <td className="px-4 py-2">{a.product?.subType}</td>
                 <td className="px-4 py-2">฿{a.startPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 <td className="px-4 py-2">฿{a.buyOutPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 <td className="px-4 py-2">{new Date(a.startAuctionDate).toLocaleString()}</td>
