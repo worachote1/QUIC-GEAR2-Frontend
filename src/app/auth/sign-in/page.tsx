@@ -9,7 +9,7 @@ import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SignInPage() {
-  const { setAccessToken } = useAuth();
+  const { setAccessToken, setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -19,8 +19,8 @@ export default function SignInPage() {
     e.preventDefault();
     try {
 
-      // Call your login API and get tokens
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/login`, 
+      // Call login API and get tokens
+      const loginRes = await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/login`, 
         {
           email,
           password,
@@ -30,6 +30,17 @@ export default function SignInPage() {
         }
       );
 
+      // Call profile API using accessToken to get user's data 
+      const profileRes = await axios.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/user/profile`, {
+        headers: { Authorization: `Bearer ${loginRes.data.data.accessToken}` },
+      });
+
+      // Set access token (update context)
+      setAccessToken(loginRes.data.data.accessToken);
+
+      // set user data 
+      setUser(profileRes.data.data);
+
       // Alert login success
       Swal.fire({
         icon: "success",
@@ -37,9 +48,6 @@ export default function SignInPage() {
         timer: 1500,
         showConfirmButton: false,
       });
-
-      // Set access token (update context)
-      setAccessToken(response.data.accessToken);
 
       // Then redirect back to previous page
       const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';

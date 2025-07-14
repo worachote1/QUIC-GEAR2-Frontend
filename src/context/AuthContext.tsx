@@ -10,6 +10,7 @@ interface AuthContextType {
   accessToken: string | null;
   setAccessToken: (token: string | null) => void;
   user: IUser | null;
+  setUser: (user: any | null) => void;
   logout: () => void;
 }
 
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   accessToken: null,
   setAccessToken: () => {},
   user: null,
+  setUser: () => {},
   logout: () => {}
 });
 
@@ -125,7 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [accessToken]);
 
   return (
-    <AuthContext.Provider value={{ accessToken, setAccessToken, user, logout }}>
+    <AuthContext.Provider value={{ accessToken, setAccessToken, user, setUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
