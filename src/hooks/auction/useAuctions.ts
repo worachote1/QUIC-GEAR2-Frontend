@@ -14,6 +14,19 @@ export function useAuctions(page: number, limit: number, searchParams: URLSearch
       const query = new URLSearchParams(searchParams);
       query.set('page', String(page));
       query.set('limit', String(limit));
+
+      // Set query for auction listings on the client page so that users only see active auctions.
+
+      // Set filters to show only active auctions
+      query.set('auctionStatus', 'IN_PROGRESS');
+
+      const now = new Date().toISOString();
+
+      // Show only auctions that already started
+      query.set('startDateTo', now); // startDate must be <= now
+
+      // Show only auctions that haven't ended yet
+      query.set('endDateFrom', now); // endDate must be > now
        
       try {
         const res = await api.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auction?${query.toString()}`);
