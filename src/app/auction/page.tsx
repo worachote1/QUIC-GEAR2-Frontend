@@ -2,29 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import AuctionCard from '@/components/auction/AuctionCard';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { IAuction } from '@/types/auction';
 import api from '@/lib/axios';
+import { PaginationAuction } from '@/components/paginations/PaginationAuction';
+import { useAuctions } from '@/hooks/auction/useAuctions';
+import { AuctionFilters } from '@/components/filter/AuctionFilter';
+import { AdminAuctionFilterChips } from '@/components/filter/AdminAuctionFilterChips';
 
 
 export default function AuctionListPage() {
-  const [auctions, setAuctions] = useState<IAuction[]>([]);
-  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
-  useEffect(() => {
-    const fetchAuctions = async () => {
-      try {
-        const res = await api.get(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auction`);
-        setAuctions(res.data.data);
-      } catch (err) {
-        console.error("Failed to load auctions", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { auctions, loading, setAuctions, totalPages } = useAuctions(page, limit, searchParams);
 
-    fetchAuctions();
-  }, []);
+
 
   // help removes auction when timer hits 0
   // Callback(pass to auctionCard component) to remove expired auction from the list
@@ -36,12 +30,23 @@ export default function AuctionListPage() {
   if (loading) return <p className="text-center mt-10">Loading auctions...</p>;
 
   return (
-    // grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4
-    // flex flex-wrap gap-6 p-4 justify-center
-    <div className="flex flex-wrap gap-6 p-4 justify-center">
-      {auctions.map((auction) => (
-        <AuctionCard key={auction.id} auction={auction} onExpire={handleAuctionExpire} />
-      ))}
+    <div className="p-6">
+      <div className='max-w-[1580px] mx-auto '>
+        <h1 className="text-2xl font-bold mb-4">{`🔥 Auction Items (${auctions.length} items) 🔥`}</h1>
+
+        {/* Filters + Tags */}
+        <AuctionFilters />
+        <AdminAuctionFilterChips />
+
+        <div className="flex flex-wrap gap-6 py-6 justify-start ">
+          {auctions.map((auction) => (
+            <AuctionCard key={auction.id} auction={auction} onExpire={handleAuctionExpire} />
+          ))}
+        </div>
+
+        {/* Pagination controls */}
+        <PaginationAuction page={page} setPage={setPage} totalPages={totalPages} />
+      </div>
     </div>
   );
 }

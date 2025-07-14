@@ -43,7 +43,7 @@ const AuctionCard = ({ auction, onExpire }: AuctionCardProps) => {
 
   return (
     // max-w-sm bg-white rounded overflow-hidden shadow-lg flex flex-col
-    <div className="w-full max-w-sm bg-white rounded overflow-hidden shadow-lg flex flex-col">
+    <div className="w-full max-w-[280px] bg-white rounded overflow-hidden shadow-lg flex flex-col">
       <img
         src={getPublicImageUrl(auction.product.imgPath[0])}
         alt={auction.product.name}
