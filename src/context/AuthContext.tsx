@@ -10,12 +10,14 @@ interface AuthContextType {
   accessToken: string | null;
   setAccessToken: (token: string | null) => void;
   user: IUser | null;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   accessToken: null,
   setAccessToken: () => {},
   user: null,
+  logout: () => {}
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -23,6 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
+  // refreshAndLoadUser function: get new accessToken using existing refresh token --> get user profile
   const refreshAndLoadUser = async () => {
     try {
       
@@ -48,6 +51,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setAccessToken(null);
         setUser(null);
     }
+  };
+
+  // Logout function: clear everything and go to homepage
+  const logout = async () => {
+    setAccessToken(null);
+    setUser(null);
+
+    // Call API to clear refresh token(in browser cookie) if needed
+    await axios.post(`${process.env.NEXT_PUBLIC_QUIC_GEAR2_API}/auth/logout`, {}, { withCredentials: true });
+
+    router.push('/');
   };
 
   // 1. On first load, try to refresh token and get user
@@ -111,7 +125,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [accessToken]);
 
   return (
-    <AuthContext.Provider value={{ accessToken, setAccessToken, user }}>
+    <AuthContext.Provider value={{ accessToken, setAccessToken, user, logout }}>
       {children}
     </AuthContext.Provider>
   );
