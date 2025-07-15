@@ -109,14 +109,6 @@ export function AuctionFilters() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Status</label>
-        <select value={filters.auctionStatus} onChange={e => setFilters(prev => ({ ...prev, auctionStatus: e.target.value }))} className="border px-2 py-1">
-          <option value="">All</option>
-          {AUCTION_STATUS.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
-        </select>
-      </div>
-
-      <div>
         <label className="block text-sm font-medium">Min Start Price</label>
         <input type="number" className="border px-2 py-1 w-24" value={filters.minStartPrice} onChange={e => setFilters(prev => ({ ...prev, minStartPrice: e.target.value }))} />
       </div>
